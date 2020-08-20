@@ -13,10 +13,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _videoPlayerController = VideoPlayerController.network(
-        'http://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4')
-      ..initialize().then((value) {
-        setState(() {});
-      });
+//        'http://techslides.com/demos/sample-videos/small.mp4'
+        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
     _initializeVideoPlayerFuture = _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
     _videoPlayerController.setVolume(1.0);
@@ -38,6 +36,7 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
       ),
       body: _bodyWidget(context),
+      floatingActionButton: _fabWidget(context),
     );
   }
 
@@ -45,15 +44,36 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder(
       future: _initializeVideoPlayerFuture,
       builder: (context, snapshot) {
+        print('mData: ${snapshot.connectionState}');
         if (snapshot.connectionState == ConnectionState.done) {
           return AspectRatio(
             aspectRatio: _videoPlayerController.value.aspectRatio,
             child: VideoPlayer(_videoPlayerController),
           );
         } else {
-          return Center(child: CircularProgressIndicator());
+          return AspectRatio(
+            aspectRatio: _videoPlayerController.value.aspectRatio,
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
       },
+    );
+  }
+
+  Widget _fabWidget(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        setState(() {
+          if (_videoPlayerController.value.isPlaying) {
+            _videoPlayerController.pause();
+          } else {
+            _videoPlayerController.play();
+          }
+        });
+      },
+      child: Icon(_videoPlayerController.value.isPlaying
+          ? Icons.pause
+          : Icons.play_arrow),
     );
   }
 }
